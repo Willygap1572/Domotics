@@ -12,10 +12,9 @@ if __name__ == '__main__':
     # nos conectamos al broker
     client.connect(host='localhost', port=1883)
     client.subscribe('redes2/2391/1/controler')
-    
-    # publicamos un mensaje
-    print("[Sending]: \n\t" + "Theme: redes2/2391/1/sensor/1" + "\n\t" + "Message " + "ShutDown")
-    client.publish('redes2/2391/1/sensor/1', 'redes2/2391/1/controler;ShutDown')
     # bucle de espera de mensajes
-    client.loop_forever()
-        
+    try:
+        client.loop_forever()
+    except KeyboardInterrupt:
+        print("[KeyboardInterrupt]: Stoping...")
+        exit(0)    

@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import random
 
 class Switch():
-    def __init__(self, id, state=False, host="redes2.ii.uam.es", port=1883, fail=0.3):
+    def __init__(self, id, host, port, fail, state=False):
         self.id = id
         self.theme = "redes2/2391/1/switch/" + str(id)
         self.state = state
@@ -20,9 +20,6 @@ class Switch():
         print("[Received]: \n\t" + "Theme: " + msg.topic + "\n\t" + "From: " + source + "\n\t" + "Message: " + message)
         if message == "toggle":
             self.toggle_state()
-
-    def __str__(self):
-        return self.name
 
     def get_state(self):
         return self.state
@@ -47,5 +44,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not args.id:
         print("[FAIL] Usage: " + parser.usage)
+        exit(1)
     switch = Switch(id=args.id, host=args.host, port=args.port, fail=args.probability)
     switch.client.loop_forever()
+    exit(0)
