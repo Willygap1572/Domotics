@@ -1,0 +1,2 @@
+GREATER = 1
+LOWER = 0

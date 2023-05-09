@@ -1,0 +1,29 @@
+<html>
+<tbody>
+  {% for rule in rules %}
+  <tr data-rule-id="{{ rule.id }}">
+    <td>{{ rule.activator.name }}</td>
+    <td>{{ rule.activator.state }}</td>
+    <td>{{ rule.switch.name }}</td>
+    {% if rule.switch.state == '1' %}
+    <td style="background-color: rgb(155, 248, 155);">ON</td>
+    {% else %}
+    <td style="background-color: rgb(255, 162, 162);">OFF</td>
+    {% endif %}
+    <td>{{ rule.threshold }}</td>
+    {% if rule.type == "1"%}
+    <td>GREATER</td>
+    {% else %}
+    <td>LOWER</td>
+    {% endif %}
+    <td>{{ rule.description }}</td>
+    <td>
+      <button class="btn btn-sm btn-primary edit-rule-btn" data-rule-id="{{ rule.id }}">Editar</button>
+      <button class="btn btn-sm btn-danger delete-rule-btn" data-rule-id="{{ rule.id }}" style="background-color: rgb(255, 162, 162)
+        ;">Eliminar</button>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+</html>

@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 from django.template import loader
-from .models import Switch, Sensor, Clock
+from .models import Switch, Sensor, Clock, Rule
 from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
@@ -51,3 +51,17 @@ def clock(request, clock_id):
     else:
         clock = Clock.objects.get(pk=clock_id)
         return HttpResponse(clock.time)
+
+def rules(request):
+    template = loader.get_template('rules.html')
+    context = {
+        'rules': Rule.objects.all(),
+    }
+    return HttpResponse(template.render(context, request))
+
+def rule_list(request):
+    template = loader.get_template('rule-list.html')
+    context = {
+        'rules': Rule.objects.all(),
+    }
+    return HttpResponse(template.render(context, request))

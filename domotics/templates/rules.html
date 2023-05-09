@@ -1,0 +1,88 @@
+{% block content %}
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  table th {
+    background-color: #ba8bff;
+  }
+
+  table td,
+  table th {
+    border: 1px solid black;
+  }
+</style>
+
+<h1>Reglas</h1>
+
+<button id="create-rule-btn" class="btn btn-primary" style="align-self: flex-end;">Crear nueva regla</button>
+<br>
+<br>
+<table id="rules-table" style="text-align: center;">
+  <thead>
+    <tr>
+      <th>Activador</th>
+      <th>Estado activador</th>
+      <th>Switch</th>
+      <th>Estado switch</th>
+      <th>Threshold</th>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rule in rules %}
+    <tr data-rule-id="{{ rule.id }}">
+      <td>{{ rule.activator.name }}</td>
+      <td>{{ rule.activator.state }}</td>
+      <td>{{ rule.switch.name }}</td>
+      {% if rule.switch.state == '1' %}
+      <td style="background-color: rgb(155, 248, 155);">ON</td>
+      {% else %}
+      <td style="background-color: rgb(255, 162, 162);">OFF</td>
+      {% endif %}
+      <td>{{ rule.threshold }}</td>
+      {% if rule.type == "1"%}
+      <td>GREATER</td>
+      {% else %}
+      <td>LOWER</td>
+      {% endif %}
+      <td>{{ rule.description }}</td>
+      <td>
+        <button class="btn btn-sm btn-primary edit-rule-btn" data-rule-id="{{ rule.id }}">Editar</button>
+        <button class="btn btn-sm btn-danger delete-rule-btn" data-rule-id="{{ rule.id }}" style="background-color: rgb(255, 162, 162)
+        ;">Eliminar</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function () {
+    // Actualizar la tabla con Ajax
+    function updateRulesTable() {
+      console.log('Updating rules table...');
+      $.ajax({
+        url: '{% url "rule-list" %}',
+        type: 'GET',
+        dataType: 'html',
+        success: function (data) {
+          $('#rules-table tbody').html(data);
+        }
+      });
+    }
+
+    // Actualizar la tabla automáticamente cada 10 segundos
+    setInterval(function () {
+      updateRulesTable();
+    }, 1000);
+  });
+</script>
+{% endblock %}

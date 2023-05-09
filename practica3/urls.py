@@ -17,7 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls.static import static
 from django.conf import  settings
+from django.urls.conf import include
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('domotics/', include('domotics.urls')),
+    path('', RedirectView.as_view(url='domotics/')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
