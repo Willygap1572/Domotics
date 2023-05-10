@@ -11,16 +11,16 @@
     <td style="background-color: rgb(255, 162, 162);">OFF</td>
     {% endif %}
     <td>{{ rule.threshold }}</td>
-    {% if rule.type == "1"%}
+    {% if rule.type == 1%}
     <td>GREATER</td>
     {% else %}
     <td>LOWER</td>
     {% endif %}
     <td>{{ rule.description }}</td>
-    <td>
-      <button class="btn btn-sm btn-primary edit-rule-btn" data-rule-id="{{ rule.id }}">Editar</button>
-      <button class="btn btn-sm btn-danger delete-rule-btn" data-rule-id="{{ rule.id }}" style="background-color: rgb(255, 162, 162)
-        ;">Eliminar</button>
+    <td style="padding: 10px;">
+      <a class="buton" href="{% url 'rule-update' rule.id%}" data-rule-id="{{ rule.id }}">Editar</a>
+      <a class="buton" href="{% url 'rule-delete' rule.id%}" data-rule-id="{{ rule.id }}" style="background-color: rgb(255, 162, 162)
+      ;">Eliminar</a>
     </td>
   </tr>
   {% endfor %}

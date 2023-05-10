@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import time
 import json
+import os, sys
 
 flag = True
 
@@ -85,12 +86,13 @@ if __name__ == "__main__":
     parser.add_argument('--min', '-m', type=int, default=20, help='Valor mínimo del sensor')
     parser.add_argument('--max', '-M', type=int, default=30, help='Valor máximo del sensor')
     parser.add_argument('--increment', '-inc', type=int, default=1, help='Incremento del valor del sensor')
+    parser.add_argument('--name', '-n', type=str, default=None, help='Nombre del sensor')
     parser.add_argument('id', type=int, help='Id del sensor')
     args = parser.parse_args()
     if not args.id:
         print("[FAIL] Usage: " + parser.usage)
         exit(1)
-    sensor = Sensor(aid=args.id, minim=args.min, maxim=args.max, interval=args.increment, increment=args.increment, host=args.host, port=args.port)
+    sensor = Sensor(aid=args.id, minim=args.min, maxim=args.max, interval=args.increment, increment=args.increment, host=args.host, port=args.port, name=args.name)
     try:
         import threading
         t = threading.Thread(target=sensor.update_message)
@@ -105,4 +107,7 @@ if __name__ == "__main__":
         print("[Sending]: \n\t" + "Theme: redes2/2391/1/controler" + "\n\t" + "Message: " + str(data['message']))
         sensor.client.publish("redes2/2391/1/controler", json.dumps(data))
         sensor.client.disconnect()
-        exit(0)
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)

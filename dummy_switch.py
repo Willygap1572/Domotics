@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt
 import random
 import json
-
+import sys, os
 
 class Switch():
 
@@ -60,7 +60,7 @@ class Switch():
             switch_dict = self.switch_to_dict()
             switch_dict['message'] = 'Failure'
             print("[FAIL] El interruptor " + str(self.aid) + " ha fallado")
-            self.client.publish("redes2/2391/1/controler", self.theme + ';' + f"Switch {self.aid} failed")
+            self.client.publish("redes2/2391/1/controler", json.dumps(switch_dict))
 
     def set_off(self):
         if random.random() > self.fail:
@@ -95,12 +95,13 @@ if __name__ == "__main__":
     parser.add_argument('--host', type=str, default="redes2.ii.uam.es", help='Host del broker MQTT')
     parser.add_argument('--port', '-p', type=int, default=1883, help='Puerto del broker MQTT')
     parser.add_argument('--probability', '-P', type=float, default=0.3, help='Probabilidad de fallo')
+    parser.add_argument('--name', '-n', type=str, default=None, help='Nombre del interruptor')
     parser.add_argument('id', type=int, help='Id del interruptor')
     args = parser.parse_args()
     if not args.id:
         print("[FAIL] Usage: " + parser.usage)
         exit(1)
-    switch = Switch(aid=args.id, host=args.host, port=args.port, fail=args.probability)
+    switch = Switch(aid=args.id, host=args.host, port=args.port, fail=args.probability, name=args.name)
     try:
         switch.client.loop_forever()
     except KeyboardInterrupt:
@@ -110,5 +111,7 @@ if __name__ == "__main__":
         print("[Sending]: \n\t" + "Theme: redes2/2391/1/controler" + "\n\t" + "Message: " + str(data['message']))
         switch.client.publish("redes2/2391/1/controler", json.dumps(data))
         switch.client.disconnect()
-        exit(0)
-    exit(0)
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)

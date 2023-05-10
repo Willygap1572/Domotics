@@ -3,6 +3,7 @@ import time
 import datetime
 import threading
 import json
+import os, sys
 
 flag = True
 
@@ -88,6 +89,7 @@ if __name__ == "__main__":
     parser.add_argument('--time', '-t', type=str, default=datetime.datetime.now().strftime("%H:%M:%S"), help='Hora de inicio del reloj')
     parser.add_argument('--increment', '-i', type=int, default=1, help='Incremento de tiempo entre mensajes')
     parser.add_argument('--rate', '-r', type=int, default=1, help='Cantidad de mensajes por segundo')
+    parser.add_argument('--name', '-n', type=str, default=None, help='Nombre del reloj')
     parser.add_argument('aid', type=int, help='Id del reloj')
     args = parser.parse_args()
     if not args.aid:
@@ -97,7 +99,7 @@ if __name__ == "__main__":
         print("[FAIL] Invalid time format")
         exit(1)
     try:
-        clock = Clock(aid=args.aid, time=args.time, increment=args.increment, rate=args.rate, host=args.host, port=args.port)
+        clock = Clock(aid=args.aid, time=args.time, increment=args.increment, rate=args.rate, host=args.host, port=args.port, name=args.name)
         t = threading.Thread(target=clock.update_message)
         t.start()
         clock.client.loop_forever()
@@ -110,4 +112,7 @@ if __name__ == "__main__":
         print("[Sending]: \n\t" + "Theme: redes2/2391/1/controler" + "\n\t" + "Message: " + str(data['message']))
         clock.client.publish("redes2/2391/1/controler", json.dumps(data))
         clock.client.disconnect()
-        exit(0)
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)

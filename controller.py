@@ -3,6 +3,7 @@ import json
 import os
 import django
 import datetime
+import sys
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'practica3.settings')
 django.setup()
@@ -29,9 +30,12 @@ class Controller:
         print("[Received]: \n\t" + "Theme: " + msg.topic + "\n\t" + "From: " + source + "\n\t" + "Message: " + str(message))
         if "switch" in data['theme']:
             if message == "ShutDown":
-                Rule.objects.filter(switch=data['aid']).delete()
-                Rule.objects.filter(activator=data['aid']).delete()
-                Switch.objects.get(aid=data['aid']).delete()
+                try:
+                    Rule.objects.filter(switch=data['aid']).delete()
+                    Rule.objects.filter(activator=data['aid']).delete()
+                    Switch.objects.get(aid=data['aid']).delete()
+                except:
+                    pass
             else:
                 switch, created = Switch.objects.get_or_create(aid=data['aid'], broker_host=data['broker_host'], port=data['port'], fail=data['fail'], name=data['name'])
                 switch.state = data['state']    
@@ -39,8 +43,11 @@ class Controller:
                 self.apply_rules(switch)
         if "sensor" in data['theme']:
             if message == "ShutDown":
-                Rule.objects.filter(activator=data['aid']).delete()
-                Sensor.objects.get(aid=data['aid']).delete()
+                try:
+                    Rule.objects.filter(activator=data['aid']).delete()
+                    Sensor.objects.get(aid=data['aid']).delete()
+                except:
+                    pass
             else:
                 sensor, created = Sensor.objects.get_or_create(aid=data['aid'], broker_host=data['broker_host'], port=data['port'], name=data['name'], increment=data['increment'], min=data['min'], max=data['max'], interval=data['interval'])
                 sensor.state = data['state']
@@ -48,13 +55,17 @@ class Controller:
                 self.apply_rules(sensor)
         if "clock" in data['theme']:
             if message == "ShutDown":
-                Rule.objects.filter(activator=data['aid']).delete()
-                Clock.objects.get(aid=data['aid']).delete()
+                try:
+                    Rule.objects.filter(activator=data['aid']).delete()
+                    Clock.objects.get(aid=data['aid']).delete()
+                except:
+                    pass
             else:
                 clock, created = Clock.objects.get_or_create(aid=data['aid'], broker_host=data['broker_host'], port=data['port'], name=data['name'], time=data['time'], increment=data['increment'], rate=data['rate'])
                 clock.state = data['state']
                 clock.save()
                 self.apply_rules(clock)
+        
 
     def apply_rules(self, activator):
         rules = Rule.objects.filter(activator=activator)
@@ -63,19 +74,21 @@ class Controller:
                 self.sensor_rule(rule)
             if "clock" in rule.activator.theme:
                 self.clock_rule(rule)
+            if "switch" in rule.activator.theme:
+                self.switch_rule(rule)
         
     def sensor_rule(self, rule):
         activator = Sensor.objects.get(theme=rule.activator.theme)
         switch = Switch.objects.get(theme=rule.switch.theme)
         if rule.type == GREATER:
-            if activator.state > int(rule.threshold) and switch.state == 0:
+            if int(activator.state) > int(rule.threshold) and int(switch.state) == 0:
                 message = {
                     'theme': 'redes2/2391/1/controler',
                     'message': 'on'
                 }
                 print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
                 controller.client.publish(rule.switch.theme, json.dumps(message))
-            elif activator.state < int(rule.threshold) and switch.state == 1:
+            elif int(activator.state) < int(rule.threshold) and int(switch.state) == 1:
                 message = {
                     'theme': 'redes2/2391/1/controler',
                     'message': 'off'
@@ -83,14 +96,14 @@ class Controller:
                 print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
                 controller.client.publish(rule.switch.theme, json.dumps(message))
         elif rule.type == LOWER:
-            if activator.state < int(rule.threshold) and switch.state == 0:
+            if int(activator.state) < int(rule.threshold) and int(switch.state) == 0:
                 message = {
                     'theme': 'redes2/2391/1/controler',
                     'message': 'on'
                 }
                 print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
                 controller.client.publish(rule.switch.theme, json.dumps(message))
-            elif activator.state > int(rule.threshold) and switch.state == 1:
+            elif int(activator.state) > int(rule.threshold) and int(switch.state) == 1:
                 message = {
                     'theme': 'redes2/2391/1/controler',
                     'message': 'off'
@@ -134,6 +147,46 @@ class Controller:
                 print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
                 controller.client.publish(rule.switch.theme, json.dumps(message))
 
+    def switch_rule(self, rule):
+        activator = Switch.objects.get(theme=rule.activator.theme)
+        switch = Switch.objects.get(theme=rule.switch.theme)
+        if rule.type == GREATER:
+            if int(activator.state) == int(rule.threshold) and int(switch.state) == 0:
+                message = {
+                    'theme': 'redes2/2391/1/controler',
+                    'message': 'on'
+                }
+                print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
+                controller.client.publish(rule.switch.theme, json.dumps(message))
+            elif int(activator.state) != int(rule.threshold) and int(switch.state) == 1:
+                message = {
+                    'theme': 'redes2/2391/1/controler',
+                    'message': 'off'
+                }
+                print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
+                controller.client.publish(rule.switch.theme, json.dumps(message))
+        elif rule.type == LOWER:
+            if int(activator.state) != int(rule.threshold) and int(switch.state) == 0:
+                message = {
+                    'theme': 'redes2/2391/1/controler',
+                    'message': 'on'
+                }
+                print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
+                controller.client.publish(rule.switch.theme, json.dumps(message))
+            elif int(activator.state) == int(rule.threshold) and int(switch.state) == 1:
+                message = {
+                    'theme': 'redes2/2391/1/controler',
+                    'message': 'off'
+                }
+                print("[Sending]: \n\t" + rule.switch.theme + "\n\t" + "Message: " + message['message'])
+                controller.client.publish(rule.switch.theme, json.dumps(message))
+
+    def clean_all(self):
+        Sensor.objects.all().delete()
+        Clock.objects.all().delete()
+        Switch.objects.all().delete()
+        Rule.objects.all().delete()
+        print("[Clean]: All objects deleted")
 
 if __name__ == '__main__':
     import argparse
@@ -147,4 +200,8 @@ if __name__ == '__main__':
         controller.client.loop_forever()
     except KeyboardInterrupt:
         print("[KeyboardInterrupt]: Stoping...")
-        exit(0)    
+        controller.clean_all()
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)

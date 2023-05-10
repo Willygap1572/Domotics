@@ -13,12 +13,24 @@
   table th {
     border: 1px solid black;
   }
+
+  .buton {
+    text-decoration: none;
+    color: black;
+    position: relative;
+    padding: 5px;
+    background-color: #ba8bff;
+    border-radius: 10px;
+  }
+
+  .buton:hover {
+    background-color: #a17ff5;
+  }
 </style>
 
 <h1>Reglas</h1>
 
-<button id="create-rule-btn" class="btn btn-primary" style="align-self: flex-end;">Crear nueva regla</button>
-<br>
+<h3><a class="buton" role="button" href="{% url 'rule-create'%}">Crear nueva regla</a></h3>
 <br>
 <table id="rules-table" style="text-align: center;">
   <thead>
@@ -45,16 +57,16 @@
       <td style="background-color: rgb(255, 162, 162);">OFF</td>
       {% endif %}
       <td>{{ rule.threshold }}</td>
-      {% if rule.type == "1"%}
+      {% if rule.type == 1%}
       <td>GREATER</td>
       {% else %}
       <td>LOWER</td>
       {% endif %}
       <td>{{ rule.description }}</td>
-      <td>
-        <button class="btn btn-sm btn-primary edit-rule-btn" data-rule-id="{{ rule.id }}">Editar</button>
-        <button class="btn btn-sm btn-danger delete-rule-btn" data-rule-id="{{ rule.id }}" style="background-color: rgb(255, 162, 162)
-        ;">Eliminar</button>
+      <td style="padding: 10px;">
+        <a class="buton" href="{% url 'rule-update' rule.id%}" data-rule-id="{{ rule.id }}">Editar</a>
+        <a class="buton" href="{% url 'rule-delete' rule.id%}" data-rule-id="{{ rule.id }}" style="background-color: rgb(255, 162, 162)
+        ;">Eliminar</a>
       </td>
     </tr>
     {% endfor %}
@@ -68,7 +80,6 @@
   $(document).ready(function () {
     // Actualizar la tabla con Ajax
     function updateRulesTable() {
-      console.log('Updating rules table...');
       $.ajax({
         url: '{% url "rule-list" %}',
         type: 'GET',

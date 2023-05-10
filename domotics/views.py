@@ -1,11 +1,14 @@
 from django.shortcuts import render
-
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
+from django.views import generic
 # Create your views here.
 
 from django.http import HttpResponse
 from django.template import loader
 from .models import Switch, Sensor, Clock, Rule
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 
 def index(request):
     template = loader.get_template('domotics/index.html')
@@ -52,16 +55,35 @@ def clock(request, clock_id):
         clock = Clock.objects.get(pk=clock_id)
         return HttpResponse(clock.time)
 
-def rules(request):
-    template = loader.get_template('rules.html')
-    context = {
-        'rules': Rule.objects.all(),
-    }
-    return HttpResponse(template.render(context, request))
+class RulesView(TemplateView):
+    template_name = 'rules.html'
 
-def rule_list(request):
-    template = loader.get_template('rule-list.html')
-    context = {
-        'rules': Rule.objects.all(),
-    }
-    return HttpResponse(template.render(context, request))
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['rules'] = Rule.objects.all()
+        return context
+
+class RuleListView(TemplateView):
+    template_name = 'rule-list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['rules'] = Rule.objects.all()
+        return context
+
+class CreateRuleView(CreateView):
+    model = Rule
+    template_name = 'rule-form.html'
+    success_url = reverse_lazy('rules')
+    fields = '__all__'
+
+class DeleteRuleView(generic.DeleteView):
+    model = Rule
+    template_name = 'rule-remove.html'
+    success_url = reverse_lazy('rules')
+
+class UpdateRuleView(generic.UpdateView):
+    model = Rule
+    template_name = 'rule-form.html'
+    success_url = reverse_lazy('rules')
+    fields = '__all__'

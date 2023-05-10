@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import json
 
 
-class TestDummySensor:
+class TestDevices:
 
     def __init__(self, host, port):
         self.host = host
@@ -27,9 +27,9 @@ if __name__ == '__main__':
     parser.add_argument('--host', type=str, default="redes2.ii.uam.es", help='Host del broker MQTT')
     parser.add_argument('--port', '-p', type=int, default=1883, help='Puerto del broker MQTT')
     args = parser.parse_args()
-    test = TestDummySensor(host=args.host, port=args.port)
+    test = TestDevices(host=args.host, port=args.port)
     try:
         test.client.loop_forever()
     except KeyboardInterrupt:
         print("[KeyboardInterrupt]: Stoping...")
-        exit(0)    
+        exit(0)

@@ -12,6 +12,9 @@ class Activator(models.Model):
     port = models.IntegerField(default=1883)
     state = models.CharField(max_length=255, default='N/A')
 
+    def __str__(self):
+        return self.name
+
 
 class Switch(Activator):
     
@@ -19,7 +22,6 @@ class Switch(Activator):
     fail = models.FloatField(default=0.3)
 
     def save(self, *args, **kwargs):
-        self.name = f"Switch{str(self.aid)}"
         self.theme = f"redes2/2391/1/switch/{str(self.aid)}"
         super().save(*args, **kwargs)
     
@@ -33,7 +35,6 @@ class Sensor(Activator):
     increment = models.IntegerField(default=1)
 
     def save(self, *args, **kwargs):
-        self.name = f"Sensor{str(self.aid)}"
         self.theme = f"redes2/2391/1/sensor/{str(self.aid)}"
         super().save(*args, **kwargs)
     
@@ -45,7 +46,6 @@ class Clock(Activator):
     rate = models.IntegerField(default=1)
 
     def save(self, *args, **kwargs):
-        self.name = f"Clock{str(self.aid)}"
         self.theme = f"redes2/2391/1/clock/{str(self.aid)}"
         super().save(*args, **kwargs)
     

@@ -1,0 +1,12 @@
+{% block content %}
+
+<h1>Borrar Regla</h1>
+
+<p>¿Estas seguro que quieres borrar esta regla?: {{ rule.description }}?</p>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="Si, borrar." />
+</form>
+
+{% endblock content %}
