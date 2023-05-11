@@ -1,5 +1,8 @@
 # Domotics
+## Context
+This project is part of the `Redes2` internship in Computer Engineering at the Universidad Autónoma de Madrid.
 
+## Description
 The project consists of a domotics system that simulates devices such as switches (Switch), sensors (Sensor) and a clock (Clock), managed by a controller (Controller) through defined rules (Rule). A Django-based web interface is also included to manage and visualize the state of the rules.
 
 ## Components
