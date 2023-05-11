@@ -1,5 +1,8 @@
 # Domotics
+## Contexto
+Este proyecto dorma parte de las practicas de `Redes2`de Ingeniería informática de la Universidad Autónoma de Madrid.
 
+## Descripcion
 El proyecto consiste en un sistema de domótica que simula dispositivos como interruptores (Switch), sensores (Sensor) y un reloj (Clock), gestionados por un controlador (Controller) mediante reglas (Rule) definidas. También se incluye una interfaz web basada en Django para administrar y visualizar el estado de las reglas.
 
 ## Componentes
